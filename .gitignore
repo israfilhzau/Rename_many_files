@@ -1,49 +1,26 @@
-# History files
-.Rhistory
-.Rapp.history
+# Set the folder path
+folder_path <- "C:/Users/israf/Documents/test"
 
-# Session Data files
-.RData
-.RDataTmp
+# Get a list of all FNA files in the folder
+file_list <- list.files(folder_path, pattern = "\\.fna$", full.names = TRUE)
 
-# User-specific files
-.Ruserdata
+# Process and rename the files using header information
+for (i in 1:length(file_list)) {
+  fna_content <- readLines(file_list[i])
+  header_line <- grep("^>", fna_content)[1]  # Get the first header line
+  
+  if (!is.na(header_line)) {
+    header <- sub("^>", "", fna_content[header_line])
+    
+    # Sanitize the header to create a valid file name
+    sanitized_header <- gsub("[^A-Za-z0-9._-]", "_", header)
+    
+    new_name <- file.path(folder_path, paste0(sanitized_header, ".fna"))
+    
+    # Rename the file
+    file.rename(file_list[i], new_name)
+  }
+}
 
-# Example code in package build process
-*-Ex.R
-
-# Output files from R CMD build
-/*.tar.gz
-
-# Output files from R CMD check
-/*.Rcheck/
-
-# RStudio files
-.Rproj.user/
-
-# produced vignettes
-vignettes/*.html
-vignettes/*.pdf
-
-# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
-.httr-oauth
-
-# knitr and R markdown default cache directories
-*_cache/
-/cache/
-
-# Temporary files created by R markdown
-*.utf8.md
-*.knit.md
-
-# R Environment Variables
-.Renviron
-
-# pkgdown site
-docs/
-
-# translation temp files
-po/*~
-
-# RStudio Connect folder
-rsconnect/
+# Print a message indicating completion
+cat("File header-based renaming completed.")
